@@ -1,0 +1,54 @@
+{
+  "name": "magpie-our-free-model",
+  "version": "2.8.0",
+  "private": true,
+  "type": "module",
+  "description": "Our Free Model — Magpie 宿主插件（独立仓库，自带 vendored 运行时）。无需登录、注册或填 API Key，即可使用包括 DeepSeek V4.1 Flash、Kimi K3 在内的前沿模型。",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShuttleSpace/magpie-our-free-model.git"
+  },
+  "homepage": "https://github.com/ShuttleSpace/magpie-our-free-model",
+  "bugs": {
+    "url": "https://github.com/ShuttleSpace/magpie-our-free-model/issues"
+  },
+  "main": "./index.mjs",
+  "exports": {
+    ".": "./index.mjs",
+    "./server": "./index.mjs"
+  },
+  "files": [
+    "index.mjs",
+    "runner.mjs",
+    "runtime.mjs",
+    "models.mjs",
+    "managed.mjs",
+    "node.mjs",
+    "handoff.mjs",
+    "installation-state.mjs",
+    "uninstall.mjs",
+    "packages/standalone",
+    "src",
+    "vendor/magpie",
+    "vendor/channel-pack",
+    "icon.svg"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs"
+  },
+  "keywords": [
+    "magpie",
+    "magpie-plugin",
+    "free-model",
+    "llm-provider"
+  ],
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  },
+  "magpie": {
+    "icon": "https://raw.githubusercontent.com/ShuttleSpace/magpie-our-free-model/main/icon.svg",
+    "maxConcurrency": 2,
+    "uninstall": "./uninstall.mjs"
+  },
+  "license": "MIT"
+}
