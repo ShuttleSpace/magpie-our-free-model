@@ -16,7 +16,7 @@ const PRODUCT = 'dsh-our-free-model-magpie'
 const REGISTRY = 'dsh-our-free-model-magpie-owned.json'
 const MARKER = '.dsh-ofm-magpie-owner.json'
 const LOCK = '.dsh-ofm-magpie-lifecycle.lock'
-const packageDir = fileURLToPath(new URL('../', import.meta.url))
+const packageDir = fileURLToPath(new URL('./', import.meta.url))
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 // Files and directories the standalone runtime writes into its data directory.

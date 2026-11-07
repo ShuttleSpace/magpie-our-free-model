@@ -67,7 +67,7 @@ export async function createManagedPlugin(input, options = {}) {
       provider: PROVIDER,
       maxConcurrency: 2,
       // Carry the packaged picture without depending on access to GitHub.
-      icon: providerIcon ??= `data:image/svg+xml;base64,${fs.readFileSync(new URL('../icon.svg', import.meta.url)).toString('base64')}`,
+      icon: providerIcon ??= `data:image/svg+xml;base64,${fs.readFileSync(new URL('./icon.svg', import.meta.url)).toString('base64')}`,
       methods: [
         {
           type: 'oauth',
