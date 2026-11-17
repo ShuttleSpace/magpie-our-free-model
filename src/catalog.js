@@ -17,8 +17,11 @@ import { baseModelId, isResponsesModel } from './upstream.js'
 /** Free-tier ids the listing does not mark with a `-free` suffix. `big-pickle`
  *  is the lane's own long-standing free id (9router keeps the same id in its
  *  `KNOWN_FREE_OPENCODE_MODELS` for exactly this reason); models.dev prices it
- *  at 0/0. */
-const ALWAYS_FREE = new Set(['union-alpha', 'space-bunny-free', 'big-pickle'])
+ *  at 0/0. `union-alpha` (the lane's Messages-wire id) and `space-bunny-free`
+ *  retired from the live listing in the 2026-10-31 churn and are no longer
+ *  advertised — they stay classified here so a listing that revives them is
+ *  still served, and so the wire tests keep an honest Messages vehicle. */
+const ALWAYS_FREE = new Set(['big-pickle', 'union-alpha', 'space-bunny-free'])
 
 /**
  * Local capability baseline. `contextWindow`/`maxOutput` are the provider's
@@ -126,11 +129,35 @@ const FREE_ID_OVERRIDES = {
     effortPatch: { reasoning_effort: '$effort' },
     effortOffPatch: { reasoning_effort: 'none' },
   },
-  // models.dev: effort low|medium|high|xhigh|max; 1M window, 524288 output.
-  'space-bunny-free': {
-    vision: true, contextWindow: 1048576, maxOutput: 524288,
+  // models.dev (2026-11-06 roster): the live free set as the Oct-31 churn left
+  // it. Numbers are models.dev's published limits; region-gated ids (beam,
+  // crouton, pulse) are marked in REGION_SENSITIVE, not here.
+  'beam-free': {
+    vision: false, contextWindow: 1048576, maxOutput: 131072,
     efforts: ['low', 'medium', 'high', 'xhigh', 'max'], effortDefault: 'high',
     effortPatch: { reasoning_effort: '$effort' },
+  },
+  'flint-40b-free': {
+    vision: false, contextWindow: 262144, maxOutput: 65536,
+    efforts: ['low', 'medium', 'high', 'xhigh', 'max'], effortDefault: 'high',
+    effortPatch: { reasoning_effort: '$effort' },
+  },
+  'pulse-alpha-free': {
+    vision: true, contextWindow: 1048576, maxOutput: 131072,
+    efforts: ['low', 'high', 'max'], effortDefault: 'high',
+    effortPatch: { reasoning_effort: '$effort' },
+  },
+  // models.dev: 1M window, 270000 output, effort minimal..max (no `none` —
+  // thinking does not switch off in practice, so the menu starts at minimal).
+  'crouton-alpha-free': {
+    vision: true, contextWindow: 1048576, maxOutput: 262144,
+    efforts: ['minimal', 'low', 'medium', 'high', 'xhigh', 'max'], effortDefault: 'high',
+    effortPatch: { reasoning_effort: '$effort' },
+  },
+  // models.dev: 262144/262144, reasoning_options empty → no level menu, so the
+  // free lane's token ladder applies.
+  'nemotron-3.5-lightning-free': {
+    vision: false, contextWindow: 262144, maxOutput: 262144,
   },
   // models.dev: 1M window, 131072 output, reasoning_options `toggle` only →
   // no level menu, so the free lane's token ladder applies.
@@ -145,22 +172,19 @@ const FREE_ID_OVERRIDES = {
 /** Human-facing display names, so a raw upstream id never reaches the picker. */
 const DISPLAY_NAMES = {
   'mimo-v2.6-flash-free': 'MiMo V2.6 Flash',
-  'mimo-v2.5-free': 'MiMo V2.5',
-  'muse-spark-1.3-contributor-free': 'Muse Spark 1.3',
-  'muse-spark-1.2-contributor-free': 'Muse Spark 1.2',
-  'nemotron-3-ultra-free': 'Nemotron 3 Ultra',
+  'beam-free': 'Beam Free',
+  'flint-40b-free': 'Flint 40B Free',
+  'pulse-alpha-free': 'Pulse Alpha Free',
+  'crouton-alpha-free': 'Crouton Alpha Free',
   'nemotron-3.5-lightning-free': 'Nemotron 3.5 Lightning',
-  'ling-3.0-flash-fin-free': 'Ling 3.0 Flash Fin',
-  'space-bunny-free': 'Space Bunny',
-  'union-alpha': 'Union Alpha',
-  'deepseek-v4-flash-free': 'DeepSeek V4 Flash',
   'deepseek-v4.1-flash-free': 'DeepSeek V4.1 Flash',
   'glm-5.3-flash-free': 'GLM 5.3 Flash',
-  'jev-1.13-free': 'Jev 1.13',
 }
 
-/** Ids whose regional availability is known to be egress-dependent. */
-const REGION_SENSITIVE = [/^muse.?spark/]
+/** Ids whose regional availability is known to be egress-dependent. The 2.2
+ * docs name Beam Free, Crouton Alpha Free and Pulse Alpha Free as region-gated;
+ * `muse-spark` kept its marker from the era it served. */
+const REGION_SENSITIVE = [/^muse.?spark/, /^beam/, /crouton/, /pulse-alpha/]
 
 /**
  * Is this id on the免密 lane? The gateway's listing mixes paid and free ids;
@@ -272,17 +296,33 @@ export const EAC_CHANNEL = 'eac'
 export const EAC_TAG = 'EAC'
 
 const EAC_DISPLAY_NAMES = {
-  // The OpenCode free lane is relayed server-side; the org prefix is routing
-  // detail, so the picker shows the model's own name with the lane's mark.
-  'opencode/deepseek-v4.1-flash-free': 'DeepSeek V4.1 Flash Highspeed',
-  'opencode/glm-5.3-flash-free': 'GLM 5.3 Flash Highspeed',
+  // These two ids are the lane's routing names; the models behind them are
+  // Dahl Inference's (`inference.dahl.global`), whose own docs name them
+  // "DeepSeek V4 Flash" and "GLM 5.3 Flash". The card shows that name, not the
+  // relay's internal spelling — the org prefix and the `-free` suffix are both
+  // routing detail.
+  'opencode/deepseek-v4.1-flash-free': 'DeepSeek V4 Flash',
+  'opencode/glm-5.3-flash-free': 'GLM 5.3 Flash',
   'deepseek-ai/deepseek-v4.1-flash': 'DeepSeek V4.1 Flash',
-  'moonshotai/kimi-k2.6': 'Kimi K2.6',
+  // Kimi K2.6 was removed from the NVIDIA channel on 2026-11-14 (its listing
+  // there never served this lane), so it is no longer named here either — an
+  // entry the catalog cannot receive is a name the picker never shows.
   'moonshotai/kimi-k3': 'Kimi K3',
   'openai/gpt-oss-20b': 'GPT-OSS 20B',
   'z-ai/glm-5.3': 'GLM 5.3',
   'z-ai/glm-5.3-flash': 'GLM 5.3 Flash',
   'mistralai/mistral-large-4-1t-a52b': 'Mistral Large 4 1T A52B',
+  // AMD Radeon (developer.amd.com.cn). The lane namespaces its ids `amd/…`;
+  // the card drops the prefix the same way it drops `org/` elsewhere.
+  'amd/DeepSeek-V4.1-Flash': 'DeepSeek V4.1 Flash (AMD)',
+  'amd/DeepSeek-V4-Flash': 'DeepSeek V4 Flash (AMD)',
+  'amd/Gemma-4-31B-IT': 'Gemma 4 31B IT (AMD)',
+  'amd/GLM-5.3-Flash': 'GLM 5.3 Flash (AMD)',
+  'amd/MiMo-V2.6-Flash': 'MiMo V2.6 Flash (AMD)',
+  'amd/MiniCPM5-2B': 'MiniCPM5 2B (AMD)',
+  'amd/MiniCPM-V-4.7-1B': 'MiniCPM-V 4.7 1B (AMD)',
+  'amd/MiniCPM-V-4.7-35B-A3B': 'MiniCPM-V 4.7 35B A3B (AMD)',
+  'amd/Qwen3.8-27B': 'Qwen3.8 27B (AMD)',
 }
 
 /**
@@ -340,24 +380,126 @@ const EAC_CAPABILITIES = [
     effortPatch: { reasoning_effort: '$effort' },
     effortOffPatch: { reasoning_effort: 'none' },
   },
-  // The OpenCode lane's two ids, relayed through the highspeed NVIDIA Build
-  // channel. The model is the same one the NVIDIA entries above describe, so
-  // its window and its menu are theirs: the shared `reasoning_effort` enum
-  // NVIDIA Build validates, with `none` as the off rung. `maxOutput` stays the
-  // free relay's own re-verified ceiling (384000 / 131072) — the relay enforces
-  // its own limit on the wire, which is tighter than NVIDIA's published one.
-  // The upstream id keeps its `-free` suffix (routing detail); the card's label
-  // says highspeed.
+  // The OpenCode lane's two ids, served by Dahl Inference
+  // (`inference.dahl.global`, docs read 2026-11-14). Both are the broker's own
+  // ids: DeepSeek-V4-Flash-0731 and GLM-5.3-Flash.
+  //
+  // - Window: Dahl's `/docs/models/` publishes 400K for both.
+  // - Vision: Dahl states plainly that vision "is not offered on current
+  //   models", and `image_url` content is rejected with a 400 — so `vision` is
+  //   false, not the NVIDIA Build `true` its namesakes carry.
+  // - Menu: Dahl validates `reasoning_effort` against
+  //   none|minimal|low|medium|high|xhigh|max and rejects `disabled` by name
+  //   ("unsupported value: got \"disabled\""), so the off rung is `none` — the
+  //   `effortOffPatch` below, which is what the plugin sends for `disabled`.
+  // - Output: DeepSeek's ceiling is measured, not guessed — a 5M `max_tokens`
+  //   request came back `finish_reason: length` at 8192 completion tokens, so
+  //   the broker caps output there regardless of what the caller asks for. GLM
+  //   shares that broker cap; Dahl publishes no per-model figure.
   {
     match: /^opencode\/deepseek-v4/,
-    vision: true, reasoning: true, contextWindow: 1048576, maxOutput: 384000,
+    vision: false, reasoning: true, contextWindow: 409600, maxOutput: 8192,
     efforts: ['disabled', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max'], effortDefault: 'high',
     effortPatch: { reasoning_effort: '$effort' },
     effortOffPatch: { reasoning_effort: 'none' },
   },
   {
+    // GLM answers with reasoning even at `none` (measured: `none` still spent
+    // 57 reasoning tokens), so its menu has no off rung and the card shows the
+    // shared-budget tag rather than promising a switch it cannot honour.
     match: /^opencode\/glm-5\.3-flash/,
-    vision: true, reasoning: true, contextWindow: 1048576, maxOutput: 131072,
+    vision: false, reasoning: true, contextWindow: 409600, maxOutput: 8192,
+    efforts: ['minimal', 'low', 'medium', 'high', 'xhigh', 'max'], effortDefault: 'high',
+    effortPatch: { reasoning_effort: '$effort' },
+  },
+  // ── AMD Radeon (developer.amd.com.cn) ───────────────────────────────────────
+  //
+  // Two sources, each used for what it actually publishes:
+  //
+  // - The platform's own listing (`GET /radeon/api/v1/models`, read 2026-11-14)
+  //   carries `context_length`, `architecture.input_modalities`, and a
+  //   per-provider block with `vision`, `reasoning` and `tools`.
+  //   `supported_parameters` lists `reasoning_effort`, so the level is the real
+  //   control on the wire.
+  // - The output ceiling comes from **each model's own vendor docs**, because
+  //   the platform publishes none. Where a vendor publishes one it is used
+  //   verbatim; where a vendor publishes none either, `maxOutput` falls back to
+  //   the platform's window and the comment says so — a guess is worse than a
+  //   generous ceiling the vendor may clamp.
+  //
+  // Per-model vendor sources:
+  // - DeepSeek V4.1 Flash / V4 Flash: api-docs.deepseek.com model table —
+  //   1M context, 384K max output (`deepseek-flash`, "DeepSeek-V4.1-Flash-1017";
+  //   the older v4-flash name is served by the same model).
+  // - GLM-5.3-Flash: docs.z.ai/guides/llm/glm-5.3-flash — 1M context, 128K max
+  //   output. (The platform's listing reports 262144 for this id; the vendor's
+  //   own figure is the larger one, so the window below is the platform's, which
+  //   is the one requests actually hit.)
+  // - Gemma 4 31B IT: ai.google.dev model card — 256K context; Google publishes
+  //   no output ceiling, so it inherits the window.
+  // - MiMo V2.6 Flash / Qwen3.8 27B / MiniCPM-V 4.7 / MiniCPM5 2B: neither the
+  //   platform nor the vendor publishes an output ceiling (checked 2026-11-14),
+  //   so each inherits its window and the card shows the window as the ceiling.
+  {
+    match: /^amd\/DeepSeek-V4\.1-Flash/,
+    vision: true, reasoning: true, contextWindow: 1048576, maxOutput: 393216,
+    efforts: ['disabled', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max'], effortDefault: 'high',
+    effortPatch: { reasoning_effort: '$effort' },
+    effortOffPatch: { reasoning_effort: 'none' },
+  },
+  {
+    match: /^amd\/DeepSeek-V4-Flash/,
+    vision: false, reasoning: true, contextWindow: 1048576, maxOutput: 393216,
+    efforts: ['disabled', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max'], effortDefault: 'high',
+    effortPatch: { reasoning_effort: '$effort' },
+    effortOffPatch: { reasoning_effort: 'none' },
+  },
+  {
+    match: /^amd\/GLM-5\.3-Flash/,
+    vision: false, reasoning: true, contextWindow: 262144, maxOutput: 131072,
+    efforts: ['disabled', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max'], effortDefault: 'high',
+    effortPatch: { reasoning_effort: '$effort' },
+    effortOffPatch: { reasoning_effort: 'none' },
+  },
+  {
+    // Xiaomi publishes no output ceiling for MiMo V2.6 Flash, so it inherits
+    // the window rather than a guessed 32K.
+    match: /^amd\/MiMo-V2\.6-Flash/,
+    vision: true, reasoning: true, contextWindow: 1048576, maxOutput: 1048576,
+    efforts: ['disabled', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max'], effortDefault: 'high',
+    effortPatch: { reasoning_effort: '$effort' },
+    effortOffPatch: { reasoning_effort: 'none' },
+  },
+  {
+    // Google's Gemma 4 model card states 256K of context and no output ceiling.
+    match: /^amd\/Gemma-4-31B-IT/,
+    vision: true, reasoning: true, contextWindow: 262144, maxOutput: 262144,
+    efforts: ['disabled', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max'], effortDefault: 'high',
+    effortPatch: { reasoning_effort: '$effort' },
+    effortOffPatch: { reasoning_effort: 'none' },
+  },
+  {
+    // Alibaba publishes no output ceiling for Qwen3.8-27B on the model-studio
+    // pages; it inherits the window.
+    match: /^amd\/Qwen3\.8-27B/,
+    vision: true, reasoning: true, contextWindow: 262144, maxOutput: 262144,
+    efforts: ['disabled', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max'], effortDefault: 'high',
+    effortPatch: { reasoning_effort: '$effort' },
+    effortOffPatch: { reasoning_effort: 'none' },
+  },
+  {
+    // OpenBMB publishes no output ceiling for the MiniCPM-V 4.7 pair either.
+    match: /^amd\/MiniCPM-V/,
+    vision: true, reasoning: true, contextWindow: 262144, maxOutput: 262144,
+    efforts: ['disabled', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max'], effortDefault: 'high',
+    effortPatch: { reasoning_effort: '$effort' },
+    effortOffPatch: { reasoning_effort: 'none' },
+  },
+  {
+    // MiniCPM5-2B: the project README states "Context Length 131,072" and no
+    // output ceiling.
+    match: /^amd\/MiniCPM5-2B/,
+    vision: false, reasoning: true, contextWindow: 131072, maxOutput: 131072,
     efforts: ['disabled', 'minimal', 'low', 'medium', 'high', 'xhigh', 'max'], effortDefault: 'high',
     effortPatch: { reasoning_effort: '$effort' },
     effortOffPatch: { reasoning_effort: 'none' },
@@ -407,25 +549,25 @@ const EAC_FEATURED = new Set([
 /**
  * Display-only ids for the card's small line.
  *
- * The OpenCode lane serves its ids with a `-free` suffix that is upstream
- * routing detail; this build relays those two models through the highspeed
- * NVIDIA Build channel, so the line shows the id the channel actually names
- * (`deepseek-v4.1-flash-free 1017` → `deepseek-v4.1-flash-highspeed 1017`).
- * Only the label moves: the catalog `id` is what the adapter matches, and it
- * keeps the upstream spelling.
+ * The lane serves its ids under its own routing names, with a `-free` suffix
+ * that is upstream detail. Behind them are Dahl Inference's models, and the
+ * line shows the id Dahl itself publishes (`GET /v1/models`, read 2026-11-14)
+ * — that is the string a reader can paste into a Dahl-compatible client. Only
+ * the label moves: the catalog `id` is what the adapter matches, and it keeps
+ * the lane's spelling.
  */
 const EAC_LABELS = {
-  'opencode/deepseek-v4.1-flash-free': 'deepseek-v4.1-flash-highspeed 1017',
-  'opencode/glm-5.3-flash-free': 'glm-5.3-flash-highspeed',
+  'opencode/deepseek-v4.1-flash-free': 'deepseek-ai/DeepSeek-V4-Flash-0731',
+  'opencode/glm-5.3-flash-free': 'zai-org/GLM-5.3-Flash',
 }
 
 function eacLabel(modelId) {
   const known = EAC_LABELS[modelId]
   if (known !== undefined) return known
   const bare = modelId.includes('/') ? modelId.slice(modelId.indexOf('/') + 1) : modelId
-  // Any remaining `-free` suffix is the same upstream detail; it is shown as
-  // the channel's highspeed mark rather than leaked into the card.
-  return bare.replace(/(?:^|[-_])free(?:$|[-_.])/, match => match.replace('free', 'highspeed'))
+  // Any remaining `-free` suffix is the lane's own routing detail; the line
+  // drops it rather than leaking it into the card.
+  return bare.replace(/(?:^|[-_])free(?:$|[-_.])/, '')
 }
 
 /** `org/model` → the model's own name under the channel tag. */
@@ -467,11 +609,10 @@ export function buildEacCatalog(ids) {
       // The card's small line under the name. The `id` keeps its `org/` prefix —
       // that is what keeps this row distinct from the free lane's same-named
       // model during the merge — but the prefix is routing detail, so the line
-      // shows the model's own id, with a display-only version marker where needed.
-      // The OpenCode lane's two ids are shown as their highspeed ids: the lane
-      // relays them through the highspeed NVIDIA Build channel, and the raw
-      // upstream id keeps its `-free` suffix, which is routing detail the line
-      // must not show. The catalog id is untouched, so routing still matches.
+      // shows the id the serving platform itself publishes: for the lane's two
+      // models that is Dahl's own `deepseek-ai/DeepSeek-V4-Flash-0731` /
+      // `zai-org/GLM-5.3-Flash`, which a reader can paste into any Dahl client.
+      // The catalog id is untouched, so routing still matches.
       label: eacLabel(id),
       channel: EAC_CHANNEL,
       wire: 'chat',
@@ -665,4 +806,104 @@ export function reviveKiloCatalog(stored) {
 /** Is this catalog row from the Kilo channel? */
 export function isKiloEntry(entry) {
   return entry?.channel === KILO_CHANNEL
+}
+
+// ── the extension lane ─────────────────────────────────────────────────────────
+
+/** Catalog tag for models an installed extension serves. */
+export const EXTENSION_CHANNEL = 'extension'
+
+/** The built-in lanes an extension may take over (`replaces`). Kept in step
+ *  with the marketplace's policy and with the runtime's takeover: only `kilo`
+ *  is actually stood down (`laneStandsDown` in src/core/runtime.js), and the
+ *  marketplace validator refuses any other claim — listing a lane here that
+ *  nothing implements would hand an extension the built-in ids and then lose
+ *  its rows to the built-in they collide with. */
+const REPLACEABLE_LANES = new Set(['kilo'])
+
+/** Wire spellings an extension channel may speak. */
+const EXTENSION_WIRES = new Set(['chat', 'responses', 'messages'])
+
+/**
+ * The catalog id one extension model answers to. Extension models are
+ * namespaced (`ext:<plugin>/<model>`) so a third-party roster can never shadow
+ * a built-in id by accident — unless the extension `replaces` that lane, in
+ * which case its models keep the lane's own ids and the built-in rows stand
+ * down (the kilo-free official extension demonstrates exactly this).
+ */
+export function extensionModelId(manifestId, modelId, replaces) {
+  const clean = String(modelId ?? '').trim()
+  if (replaces !== undefined && REPLACEABLE_LANES.has(replaces)) return clean
+  return `ext:${String(manifestId ?? '').trim()}/${clean}`
+}
+
+/** Is this catalog row served by an installed extension? */
+export function isExtensionEntry(entry) {
+  return entry?.channel === EXTENSION_CHANNEL
+}
+
+/** Normalize one `listModels`/manifest model row into a catalog entry, or null. */
+function extensionEntryOf(manifest, row) {
+  if (row === null || typeof row !== 'object' || Array.isArray(row)) return null
+  const modelId = typeof row.id === 'string' ? row.id.trim() : ''
+  if (modelId === '' || modelId.length > 128) return null
+  const wire = EXTENSION_WIRES.has(row.wire) ? row.wire : 'chat'
+  const contextWindow = number(row.contextWindow) ?? 131072
+  const entry = {
+    id: extensionModelId(manifest.id, modelId, manifest.replaces),
+    name: typeof row.name === 'string' && row.name.trim() !== '' ? row.name.trim() : displayModelName(modelId),
+    channel: EXTENSION_CHANNEL,
+    extensionId: manifest.id,
+    extensionName: typeof manifest.name === 'string' ? manifest.name : manifest.id,
+    modelId,
+    wire,
+    vision: row.vision === true,
+    reasoning: row.reasoning !== false,
+    contextWindow,
+    maxOutput: number(row.maxOutput) ?? Math.min(32768, contextWindow),
+    canDisableThinking: true,
+    regionSensitive: false,
+    source: 'manifest',
+  }
+  if (Array.isArray(row.efforts) && row.efforts.length > 0) {
+    const efforts = row.efforts.filter(level => typeof level === 'string' && level !== '').slice(0, 8)
+    if (efforts.length > 0) {
+      entry.efforts = efforts
+      entry.effortDefault = efforts.includes(row.effortDefault) ? row.effortDefault : efforts[efforts.length - 1]
+      // The declared level rides the wire as the model's own effort field — the
+      // extension names its own spelling via `effortKey` when it is not the
+      // common `reasoning_effort`/`reasoning.effort` shapes.
+      const key = typeof row.effortKey === 'string' && row.effortKey.trim() !== '' ? row.effortKey.trim() : null
+      entry.effortPatch = key !== null ? { [key]: '$effort' } : { reasoning_effort: '$effort' }
+      entry.canDisableThinking = efforts.includes('disabled') || efforts.includes('none')
+    }
+  }
+  return entry
+}
+
+/**
+ * Build the extension lane's catalog rows from one installed channel
+ * extension's model list. Rows that repeat an id are dropped.
+ */
+export function buildExtensionCatalog(manifest, rows) {
+  if (!manifest || typeof manifest !== 'object' || typeof manifest.id !== 'string') return []
+  const seen = new Set()
+  const entries = []
+  for (const row of Array.isArray(rows) ? rows : []) {
+    const entry = extensionEntryOf(manifest, row)
+    if (entry === null || seen.has(entry.id)) continue
+    seen.add(entry.id)
+    entries.push(entry)
+  }
+  return entries
+}
+
+/**
+ * Which built-in lane an enabled extension takes over, or null. Only one
+ * extension may replace a lane; the first enabled claim wins and the rest are
+ * ignored until the conflict is resolved.
+ */
+export function extensionReplaces(manifest) {
+  const replaces = typeof manifest?.replaces === 'string' ? manifest.replaces : ''
+  return REPLACEABLE_LANES.has(replaces) ? replaces : null
 }

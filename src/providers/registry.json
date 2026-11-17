@@ -133,6 +133,60 @@
     "source": "fcc"
   },
   {
+    "id": "antling",
+    "name": "Ant Ling",
+    "category": "apikey",
+    "auth": {
+      "kind": "apiKey",
+      "env": "ANTLING_API_KEY",
+      "url": "https://developer.ant-ling.com/zh-CN/docs/getting-started/quickstart/"
+    },
+    "baseUrl": "https://api.ant-ling.com/v1",
+    "format": "openai-chat",
+    "models": [
+      {
+        "id": "Ling-3.2-flash",
+        "name": "Ling 3.2 Flash",
+        "contextWindow": null,
+        "vision": true,
+        "reasoning": null
+      },
+      {
+        "id": "Ling-3.1-flash",
+        "name": "Ling 3.1 Flash",
+        "contextWindow": null,
+        "vision": null,
+        "reasoning": null
+      },
+      {
+        "id": "Ling-3.0-flash-VL",
+        "name": "Ling 3.0 Flash VL",
+        "contextWindow": null,
+        "vision": true,
+        "reasoning": null
+      },
+      {
+        "id": "Ling-3.0-flash",
+        "name": "Ling 3.0 Flash",
+        "contextWindow": null,
+        "vision": null,
+        "reasoning": null
+      },
+      {
+        "id": "Ling-3.0-tiny",
+        "name": "Ling 3.0 Tiny",
+        "contextWindow": null,
+        "vision": null,
+        "reasoning": null
+      }
+    ],
+    "notes": "Ant Ling (Ant Group) OpenAI-compatible chat completions. New-account voucher and the monthly Token coupon apply to API usage; Ling-3.2-flash is free for a limited launch window. Model ids from the official model family docs.",
+    "website": "https://developer.ant-ling.com/",
+    "local": false,
+    "source": "custom",
+    "modelsUrl": "https://api.ant-ling.com/v1/models"
+  },
+  {
     "id": "azure_openai",
     "name": "Azure OpenAI",
     "category": "apikey",
@@ -599,6 +653,31 @@
     "local": false,
     "source": "fcc",
     "modelsUrl": "https://api.deepseek.com/models"
+  },
+  {
+    "id": "edgeone_makers",
+    "name": "EdgeOne Makers",
+    "category": "apikey",
+    "auth": {
+      "kind": "apiKey",
+      "env": "EDGEONE_MAKERS_API_KEY",
+      "url": "https://console.tencentcloud.com/edgeone/makers?tab=models&subTab=apikey"
+    },
+    "baseUrl": "https://ai-gateway.edgeone.link/v1",
+    "format": "openai-chat",
+    "models": [
+      {
+        "id": "@makers/deepseek-v4-flash",
+        "name": "DeepSeek V4 Flash (Makers)",
+        "contextWindow": null,
+        "vision": null,
+        "reasoning": null
+      }
+    ],
+    "notes": "Makers Models unified edge gateway; built-in models need no vendor key and the free tier shares 500k tokens per account per month. No public model-listing endpoint is documented, so the picker uses the documented built-in id; Discover/override can extend it.",
+    "website": "https://pages.edgeone.ai/",
+    "local": false,
+    "source": "custom"
   },
   {
     "id": "experiential",
@@ -2292,6 +2371,46 @@
     "modelsUrl": "https://api.scaleway.ai/v1/models"
   },
   {
+    "id": "scnet",
+    "name": "SCNet",
+    "category": "apikey",
+    "auth": {
+      "kind": "apiKey",
+      "env": "SCNET_API_KEY",
+      "url": "https://www.scnet.cn/help/docs/mainsite/mass/tutorial/apikeymgt.html"
+    },
+    "baseUrl": "https://api.scnet.cn/api/llm/v1",
+    "format": "openai-chat",
+    "models": [
+      {
+        "id": "GLM-5.3-Flash",
+        "name": "GLM 5.3 Flash",
+        "contextWindow": null,
+        "vision": null,
+        "reasoning": null
+      },
+      {
+        "id": "DeepSeek-V4.1-Flash-1017",
+        "name": "DeepSeek V4.1 Flash 1017",
+        "contextWindow": null,
+        "vision": null,
+        "reasoning": null
+      },
+      {
+        "id": "DeepSeek-R1-Distill-Qwen-7B",
+        "name": "DeepSeek R1 Distill Qwen 7B",
+        "contextWindow": null,
+        "vision": null,
+        "reasoning": null
+      }
+    ],
+    "notes": "SCNet (National Supercomputing Internet) MaaS; OpenAI-compatible /chat/completions and /models. New-user free token packages are claimed in the SCNet client and then spent through this API; real-name account required.",
+    "website": "https://www.scnet.cn/",
+    "local": false,
+    "source": "custom",
+    "modelsUrl": "https://api.scnet.cn/api/llm/v1/models"
+  },
+  {
     "id": "siliconflow",
     "name": "SiliconFlow",
     "category": "apikey",
@@ -2428,6 +2547,60 @@
     "local": false,
     "source": "fcc",
     "modelsUrl": "https://api.siliconflow.com/v1/models"
+  },
+  {
+    "id": "telnyx",
+    "name": "Telnyx Inference",
+    "category": "apikey",
+    "auth": {
+      "kind": "apiKey",
+      "env": "TELNYX_API_KEY",
+      "url": "https://developers.telnyx.com/docs/inference"
+    },
+    "baseUrl": "https://api.telnyx.com/v2/ai/openai",
+    "format": "openai-chat",
+    "models": [
+      {
+        "id": "deepseek-ai/DeepSeek-V4.1-Flash-1017",
+        "name": "DeepSeek V4.1 Flash 1017",
+        "contextWindow": null,
+        "vision": null,
+        "reasoning": null
+      },
+      {
+        "id": "moonshotai/Kimi-K3.1-Pro",
+        "name": "Kimi K3.1 Pro",
+        "contextWindow": null,
+        "vision": true,
+        "reasoning": null
+      },
+      {
+        "id": "zai-org/GLM-5.3-Flash",
+        "name": "GLM 5.3 Flash",
+        "contextWindow": null,
+        "vision": null,
+        "reasoning": null
+      },
+      {
+        "id": "Qwen/Qwen3.8-27B",
+        "name": "Qwen 3.8 27B",
+        "contextWindow": null,
+        "vision": null,
+        "reasoning": null
+      },
+      {
+        "id": "openai/gpt-oss-120b",
+        "name": "GPT-OSS 120B",
+        "contextWindow": 131072,
+        "vision": null,
+        "reasoning": true
+      }
+    ],
+    "notes": "Telnyx Inference OpenAI-compatible chat endpoint. The $25 pre-trial credit covers Inference models and is shared with other Telnyx AI products; model ids from the official Inference catalog.",
+    "website": "https://www.telnyx.com/",
+    "local": false,
+    "source": "custom",
+    "modelsUrl": "https://api.telnyx.com/v2/ai/openai/models"
   },
   {
     "id": "tencent",
@@ -3827,63 +4000,105 @@
       "env": "KILO_API_KEY",
       "url": "https://app.kilo.ai"
     },
-    "baseUrl": "https://api.kilo.ai/api/gateway",
+    "baseUrl": "https://ai-gateway.kilo.ai/api/v1",
     "format": "openai-chat",
     "models": [
       {
         "id": "kilo-auto/free",
-        "name": "Kilo Auto Free",
+        "name": "Auto Free",
         "contextWindow": 256000,
-        "vision": null,
-        "reasoning": null
+        "vision": false,
+        "reasoning": true
       },
       {
-        "id": "nvidia/nemotron-3-super-120b-a12b:free",
-        "name": "Nemotron 3 Super 120B (Free)",
-        "contextWindow": 262144,
-        "vision": null,
-        "reasoning": null
+        "id": "nvidia/nemotron-3.5-super-vl:free",
+        "name": "NVIDIA: Nemotron 3.5 Super VL",
+        "contextWindow": 1000000,
+        "vision": true,
+        "reasoning": true
+      },
+      {
+        "id": "reflection/beam-free",
+        "name": "Reflection: Beam 1.0",
+        "contextWindow": 1048576,
+        "vision": false,
+        "reasoning": true
+      },
+      {
+        "id": "stealth/glyph-cluster",
+        "name": "Stealth: Glyph Cluster",
+        "contextWindow": 256000,
+        "vision": false,
+        "reasoning": true
+      },
+      {
+        "id": "stealth/crouton-alpha",
+        "name": "Crouton Alpha",
+        "contextWindow": 1048576,
+        "vision": true,
+        "reasoning": true
+      },
+      {
+        "id": "dots-studio/dots-3-note-preview:free",
+        "name": "Dots Studio: Dots3-Note Preview",
+        "contextWindow": 512000,
+        "vision": true,
+        "reasoning": true
+      },
+      {
+        "id": "nvidia/nemotron-3.5-lightning:free",
+        "name": "NVIDIA: Nemotron 3.5 Lightning",
+        "contextWindow": 1000000,
+        "vision": false,
+        "reasoning": true
+      },
+      {
+        "id": "cohere/north-mini-code:free",
+        "name": "Cohere: North Mini Code",
+        "contextWindow": 256000,
+        "vision": false,
+        "reasoning": true
       },
       {
         "id": "nvidia/nemotron-3-ultra-550b-a55b:free",
-        "name": "Nemotron 3 Ultra 550B (Free)",
+        "name": "NVIDIA: Nemotron 3 Ultra",
         "contextWindow": 1000000,
-        "vision": null,
-        "reasoning": null
+        "vision": false,
+        "reasoning": true
       },
       {
-        "id": "kwaipilot/kat-coder-pro-v2.5:free",
-        "name": "Kat Coder Pro v2.5 (Free)",
+        "id": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+        "name": "NVIDIA: Nemotron 3 Nano Omni",
         "contextWindow": 256000,
-        "vision": null,
-        "reasoning": null
+        "vision": true,
+        "reasoning": true
       },
       {
-        "id": "kilo-auto/frontier",
-        "name": "Kilo Auto Frontier",
-        "contextWindow": 1000000,
-        "vision": null,
-        "reasoning": null
-      },
-      {
-        "id": "kilo-auto/balanced",
-        "name": "Kilo Auto Balanced",
-        "contextWindow": 1000000,
-        "vision": null,
-        "reasoning": null
+        "id": "openrouter/free",
+        "name": "OpenRouter Free Models Router",
+        "contextWindow": 200000,
+        "vision": true,
+        "reasoning": true
       }
     ],
-    "notes": "Kilo gateway free pool; the plugin’s own Kilo channel reads the same host.",
+    "notes": "Kilo gateway free pool, snapshot 2026-11-07; the plugin’s own Kilo channel serves it keyless from the live listing — this row is the aggregate-lane fallback for a pasted key.",
     "website": "https://kilo.ai/",
     "local": false,
     "source": "fcc",
     "freeModelsHint": [
       "kilo-auto/free",
-      "nvidia/nemotron-3-super-120b-a12b:free",
+      "nvidia/nemotron-3.5-super-vl:free",
+      "reflection/beam-free",
+      "stealth/glyph-cluster",
+      "stealth/crouton-alpha",
+      "dots-studio/dots-3-note-preview:free",
+      "nvidia/nemotron-3.5-lightning:free",
+      "cohere/north-mini-code:free",
       "nvidia/nemotron-3-ultra-550b-a55b:free",
-      "kwaipilot/kat-coder-pro-v2.5:free"
+      "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
+      "openrouter/free"
     ],
-    "modelsUrl": "https://api.kilo.ai/api/gateway/models"
+    "modelsUrl": "https://ai-gateway.kilo.ai/api/v1/models"
   },
   {
     "id": "kimchi",

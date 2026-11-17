@@ -88,6 +88,17 @@ Magpie 的插件 `options` 通过 `managed` 传入：
 的 `magpie` 分支。运行时（`packages/standalone`、`src/`、`vendor/`）与宿主适配代码
 （根目录 `.mjs`）都来自该仓库；上游更新后需手动同步本仓库。
 
+**这是 Magpie 最终加载的插件仓库**：用户执行
+`magpie plugin add github:ShuttleSpace/magpie-our-free-model` 安装的是本仓库
+（`package.json` 的 `exports["./server"]` → `index.mjs`）。
+仅更新上游 `magpie` 分支或 Release 附件不会让 Magpie 更新本插件。
+
+同步流程：在上游 `magpie` 分支运行 `npm run pack:magpie`，将
+`dist/our-free-model-magpie.zip` 上传为该仓库的 Release 附件；在本仓库把 zip
+内容铺到根目录（`magpie/*.mjs` → 根目录，`packages/`、`src/`、`vendor/` 原样），
+保留本仓库自己的 `package.json`（只升 `version`），把根目录 `.mjs` 中因从
+`magpie/` 上移而失效的 `../` 引用改回 `./`，运行 `npm test`，再提交并推送 `main`。
+
 ## License
 
 MIT

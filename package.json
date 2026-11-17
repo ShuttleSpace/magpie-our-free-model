@@ -1,6 +1,6 @@
 {
   "name": "magpie-our-free-model",
-  "version": "2.8.0",
+  "version": "2.8.5",
   "private": true,
   "type": "module",
   "description": "Our Free Model — Magpie 宿主插件（独立仓库，自带 vendored 运行时）。无需登录、注册或填 API Key，即可使用包括 DeepSeek V4.1 Flash、Kimi K3 在内的前沿模型。",
